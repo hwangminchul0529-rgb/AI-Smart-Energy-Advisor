@@ -1,11 +1,17 @@
-FROM python:3.11
+FROM python:3.11-slim
 
 WORKDIR /app
 
+# 시스템 라이브러리 설치 (OpenCV를 위해 필요)
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
 COPY . .
 
-RUN pip install -r requirements.txt
-
-EXPOSE 8501
-
-CMD ["python","-m","streamlit","run","app.py","--server.port","8000","--server.address","0.0.0.0"]
+EXPOSE 8000
+CMD ["python", "-m", "streamlit", "run", "app.py", "--server.port=8000", "--server.address=0.0.0.0"]
